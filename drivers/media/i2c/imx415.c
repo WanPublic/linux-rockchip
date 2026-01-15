@@ -1240,7 +1240,7 @@ static const struct imx415_mode supported_modes[] = {
 		.hts_def = 0x01fb * IMX415_4LANES * 2,  /* 水平总时间 = 507 × 4 × 2 = 4056 */
 		.vts_def = 0x08ca,                       /* 垂直总时间 = 2250 行 */
 		.global_reg_list = imx415_global_10bit_3864x2192_regs,  /* 全局10-bit配置 */
-		.reg_list = imx415_linear_10bit_4k65fps_1782M_regs,   /* 1782Mbps寄存器配置 */
+		.reg_list = imx415_linear_10bit_3864x2192_1782M_regs,   /* 1782Mbps寄存器配置 */
 		.hdr_mode = NO_HDR,                      /* 线性模式，非HDR */
 		.mipi_freq_idx = 5,                      /* MIPI频率索引: link_freq_items[5] = 1782MHz */
 		.bpp = 10,                               /* 每像素10位 */
