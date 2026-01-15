@@ -1234,7 +1234,7 @@ static const struct imx415_mode supported_modes[] = {
 		.height = 2192,                          /* 有效图像高度 */
 		.max_fps = {
 			.numerator = 10000,              /* 帧率分子 */
-			.denominator = 600000,           /* 帧率分母: 600000/10000 = 60fps */
+			.denominator = 650000,           /* 帧率分母: 650000/10000 = 65fps */
 		},
 		.exp_def = 0x08ca - 0x08,               /* 默认曝光值: VTS - 8 */
 		.hts_def = 0x01fb * IMX415_4LANES * 2,  /* 水平总时间 = 507 × 4 × 2 = 4056 */
