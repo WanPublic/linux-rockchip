@@ -1208,6 +1208,7 @@ static __maybe_unused const struct regval imx415_linear_12bit_1284x720_2376M_reg
  * }
  */
 
+
 static __maybe_unused const struct regval imx415_linear_10bit_1080p90fps_1782M_regs[] = {
 	// ===== 基本控制寄存器 =====
 	{0x3002, 0x00},	// XMSTA - Master mode start register
@@ -1244,7 +1245,7 @@ static __maybe_unused const struct regval imx415_linear_10bit_1080p90fps_1782M_r
 	
 	// ===== 数据位宽设置 =====
 	{0x3031, 0x00},	// ADBIT - 0: 10bit
-	{0x3032, 0x00},	// MDBIT - 0: 10bit output
+	{0x3032, 0x01},	// MDBIT - 1: 12bit output
 	
 	{0x3033, 0x04},	// SYS_MODE - 4: 1782Mbps mode
 	                // PDF P54: 4h = 1782Mbps
@@ -1428,7 +1429,7 @@ static __maybe_unused const struct regval imx415_linear_10bit_1080p90fps_1782M_r
 
 static const struct imx415_mode supported_modes[] = {
 	{
-		.bus_fmt = MEDIA_BUS_FMT_SGBRG10_1X10,
+		.bus_fmt = MEDIA_BUS_FMT_SGBRG12_1X12,
 		.width = 1920,
 		.height = 1080,
 		.max_fps = {
@@ -1442,7 +1443,7 @@ static const struct imx415_mode supported_modes[] = {
 		.reg_list = imx415_linear_10bit_1080p90fps_1782M_regs,
 		.hdr_mode = NO_HDR,
 		.mipi_freq_idx = 5,
-		.bpp = 10,
+		.bpp = 12,
 		.vc[PAD0] = 0,
 		.xvclk = IMX415_XVCLK_FREQ_37M,
 	},
