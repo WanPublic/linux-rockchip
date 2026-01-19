@@ -3205,7 +3205,8 @@ static int imx415_initialize_controls(struct imx415 *imx415)
 
 	/* pixel rate = link frequency * 2 * lanes / BITS_PER_SAMPLE */
 	pixel_rate = (u32)link_freq_items[mode->mipi_freq_idx] / mode->bpp * 2 * lanes;
-	max_pixel_rate = (u32)MIPI_FREQ_1782M / mode->bpp * 2 * lanes;
+	/* 2026-01-20: 更新max_pixel_rate以支持2376M MIPI频率（90fps模式） - Antigravity */
+	max_pixel_rate = (u32)MIPI_FREQ_2376M / mode->bpp * 2 * lanes;
 	imx415->pixel_rate = v4l2_ctrl_new_std(handler, NULL,
 		V4L2_CID_PIXEL_RATE, 0, max_pixel_rate,
 		1, pixel_rate);
