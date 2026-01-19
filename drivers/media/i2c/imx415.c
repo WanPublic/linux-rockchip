@@ -830,7 +830,8 @@ static __maybe_unused const struct regval imx415_linear_10bit_3864x2192_1782M_re
 static __maybe_unused const struct regval imx415_linear_10bit_3864x2192_2376M_regs[] = {
 	{0x3008, 0x5D},  // BCWAIT_TIME[9:0]
 	{0x300A, 0x42},  // CPWAIT_TIME[9:0]
-	{0x3024, 0xCE},  // VMAX[19:0] - 垂直总行数低字节
+	{0x3024, 0xCA},  // VMAX[19:0] - 垂直总行数低字节 (0x08CA = 2250行)
+	{0x3025, 0x08},  // VMAX[19:0] - 垂直总行数中字节
 	{0x3028, 0x6E},  // HMAX[15:0] - 水平总时间低字节
 	{0x3029, 0x01},  // HMAX[15:0] - 水平总时间高字节
 	{0x3031, 0x00},  // ADBIT[1:0] - AD转换位数设置
@@ -1388,9 +1389,9 @@ static const struct imx415_mode supported_modes[] = {
 			.numerator = 10000,              /* 帧率分子 */
 			.denominator = 900000,           /* 帧率分母: 900000/10000 = 90fps */
 		},
-		.exp_def = 0xCE - 0x08,                 /* 默认曝光值: VTS - 8 */
+		.exp_def = 0x08ca - 0x08,               /* 默认曝光值: VTS - 8 = 2242 */
 		.hts_def = 0x016E * IMX415_4LANES * 2,  /* 水平总时间 = 366 × 4 × 2 = 2928 */
-		.vts_def = 0xCE,                         /* 垂直总时间 = 206 行 */
+		.vts_def = 0x08ca,                       /* 垂直总时间 = 2250 行 */
 		.global_reg_list = imx415_global_10bit_3864x2192_regs,  /* 全局10-bit配置 */
 		.reg_list = imx415_linear_10bit_3864x2192_2376M_regs,   /* 2376Mbps寄存器配置 */
 		.hdr_mode = NO_HDR,                      /* 线性模式，非HDR */
