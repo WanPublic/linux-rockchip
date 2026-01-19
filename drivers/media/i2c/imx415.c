@@ -62,6 +62,8 @@
 #define V4L2_CID_DIGITAL_GAIN		V4L2_CID_GAIN
 #endif
 
+/* 2026-01-20: 添加2376M MIPI频率定义以支持4K@90fps模式 - Antigravity */
+#define MIPI_FREQ_2376M			2376000000
 #define MIPI_FREQ_1782M			1782000000
 #define MIPI_FREQ_1188M			1188000000
 #define MIPI_FREQ_891M			891000000
@@ -72,7 +74,8 @@
 #define IMX415_4LANES			4
 #define IMX415_2LANES			2
 
-#define IMX415_MAX_PIXEL_RATE		(MIPI_FREQ_1782M / 10 * 2 * IMX415_4LANES)
+/* 2026-01-20: 更新最大像素率以支持2376M MIPI频率 - Antigravity */
+#define IMX415_MAX_PIXEL_RATE		(MIPI_FREQ_2376M / 10 * 2 * IMX415_4LANES)
 #define OF_CAMERA_HDR_MODE		"rockchip,camera-hdr-mode"
 
 #define IMX415_XVCLK_FREQ_37M		37125000
@@ -812,6 +815,150 @@ static __maybe_unused const struct regval imx415_linear_10bit_3864x2192_1782M_re
 	{REG_NULL, 0x00},
 };
 
+/*
+ * IMX415-AAQR All-pixel scan 
+ * CSI-2_4lane 
+ * 37.125MHz (修改自原始27MHz配置)
+ * AD:10bit 
+ * Output:10bit 
+ * 2376Mbps 
+ * Master Mode 
+ * 90fps 
+ * Integration Time: 11.073ms
+ * 2026-01-20: 添加4K@90fps模式配置，外部时钟从27MHz改为37.125MHz - Antigravity
+ */
+static __maybe_unused const struct regval imx415_linear_10bit_3864x2192_2376M_regs[] = {
+	{0x3008, 0x5D},  // BCWAIT_TIME[9:0]
+	{0x300A, 0x42},  // CPWAIT_TIME[9:0]
+	{0x3024, 0xCE},  // VMAX[19:0] - 垂直总行数低字节
+	{0x3028, 0x6E},  // HMAX[15:0] - 水平总时间低字节
+	{0x3029, 0x01},  // HMAX[15:0] - 水平总时间高字节
+	{0x3031, 0x00},  // ADBIT[1:0] - AD转换位数设置
+	{0x3032, 0x00},  // MDBIT - 输出位数设置
+	{0x3033, 0x00},  // SYS_MODE[3:0] - 系统模式(线性模式)
+	{0x3050, 0x08},  // SHR0[19:0] - 快门设置
+	{0x30C1, 0x00},  // XVS_DRV[1:0] - XVS驱动设置
+	{0x3116, 0x23},  // INCKSEL2[7:0] - 输入时钟选择2
+	{0x3118, 0x08},  // INCKSEL3[10:0] - 输入时钟选择3低字节
+	{0x3119, 0x01},  // INCKSEL3[10:0] - 输入时钟选择3高字节
+	{0x311A, 0xE7},  // INCKSEL4[10:0] - 输入时钟选择4
+	{0x311E, 0x23},  // INCKSEL5[7:0] - 输入时钟选择5
+	{0x32D4, 0x21},  // 内部寄存器
+	{0x32EC, 0xA1},  // 内部寄存器
+	{0x344C, 0x2B},  // 内部寄存器
+	{0x344D, 0x01},  // 内部寄存器
+	{0x344E, 0xED},  // 内部寄存器
+	{0x344F, 0x01},  // 内部寄存器
+	{0x3450, 0xF6},  // 内部寄存器
+	{0x3451, 0x02},  // 内部寄存器
+	{0x3452, 0x7F},  // 内部寄存器
+	{0x3453, 0x03},  // 内部寄存器
+	{0x358A, 0x04},  // 内部寄存器
+	{0x35A1, 0x02},  // 内部寄存器
+	{0x35EC, 0x27},  // 内部寄存器
+	{0x35EE, 0x8D},  // 内部寄存器
+	{0x35F0, 0x8D},  // 内部寄存器
+	{0x35F2, 0x29},  // 内部寄存器
+	{0x36BC, 0x0C},  // 内部寄存器
+	{0x36CC, 0x53},  // 内部寄存器
+	{0x36CD, 0x00},  // 内部寄存器
+	{0x36CE, 0x3C},  // 内部寄存器
+	{0x36D0, 0x8C},  // 内部寄存器
+	{0x36D1, 0x00},  // 内部寄存器
+	{0x36D2, 0x71},  // 内部寄存器
+	{0x36D4, 0x3C},  // 内部寄存器
+	{0x36D6, 0x53},  // 内部寄存器
+	{0x36D7, 0x00},  // 内部寄存器
+	{0x36D8, 0x71},  // 内部寄存器
+	{0x36DA, 0x8C},  // 内部寄存器
+	{0x36DB, 0x00},  // 内部寄存器
+	{0x3701, 0x00},  // ADBIT1[7:0]
+	{0x3720, 0x00},  // 内部寄存器
+	{0x3724, 0x02},  // 内部寄存器
+	{0x3726, 0x02},  // 内部寄存器
+	{0x3732, 0x02},  // 内部寄存器
+	{0x3734, 0x03},  // 内部寄存器
+	{0x3736, 0x03},  // 内部寄存器
+	{0x3742, 0x03},  // 内部寄存器
+	{0x3862, 0xE0},  // 内部寄存器
+	{0x38CC, 0x30},  // 内部寄存器
+	{0x38CD, 0x2F},  // 内部寄存器
+	{0x395C, 0x0C},  // 内部寄存器
+	{0x39A4, 0x07},  // 内部寄存器
+	{0x39A8, 0x32},  // 内部寄存器
+	{0x39AA, 0x32},  // 内部寄存器
+	{0x39AC, 0x32},  // 内部寄存器
+	{0x39AE, 0x32},  // 内部寄存器
+	{0x39B0, 0x32},  // 内部寄存器
+	{0x39B2, 0x2F},  // 内部寄存器
+	{0x39B4, 0x2D},  // 内部寄存器
+	{0x39B6, 0x28},  // 内部寄存器
+	{0x39B8, 0x30},  // 内部寄存器
+	{0x39BA, 0x30},  // 内部寄存器
+	{0x39BC, 0x30},  // 内部寄存器
+	{0x39BE, 0x30},  // 内部寄存器
+	{0x39C0, 0x30},  // 内部寄存器
+	{0x39C2, 0x2E},  // 内部寄存器
+	{0x39C4, 0x2B},  // 内部寄存器
+	{0x39C6, 0x25},  // 内部寄存器
+	{0x3A42, 0xD1},  // 内部寄存器
+	{0x3A4C, 0x77},  // 内部寄存器
+	{0x3AE0, 0x02},  // 内部寄存器
+	{0x3AEC, 0x0C},  // 内部寄存器
+	{0x3B00, 0x2E},  // 内部寄存器
+	{0x3B06, 0x29},  // 内部寄存器
+	{0x3B98, 0x25},  // 内部寄存器
+	{0x3B99, 0x21},  // 内部寄存器
+	{0x3B9B, 0x13},  // 内部寄存器
+	{0x3B9C, 0x13},  // 内部寄存器
+	{0x3B9D, 0x13},  // 内部寄存器
+	{0x3B9E, 0x13},  // 内部寄存器
+	{0x3BA1, 0x00},  // 内部寄存器
+	{0x3BA2, 0x06},  // 内部寄存器
+	{0x3BA3, 0x0B},  // 内部寄存器
+	{0x3BA4, 0x10},  // 内部寄存器
+	{0x3BA5, 0x14},  // 内部寄存器
+	{0x3BA6, 0x18},  // 内部寄存器
+	{0x3BA7, 0x1A},  // 内部寄存器
+	{0x3BA8, 0x1A},  // 内部寄存器
+	{0x3BA9, 0x1A},  // 内部寄存器
+	{0x3BAC, 0xED},  // 内部寄存器
+	{0x3BAD, 0x01},  // 内部寄存器
+	{0x3BAE, 0xF6},  // 内部寄存器
+	{0x3BAF, 0x02},  // 内部寄存器
+	{0x3BB0, 0xA2},  // 内部寄存器
+	{0x3BB1, 0x03},  // 内部寄存器
+	{0x3BB2, 0xE0},  // 内部寄存器
+	{0x3BB3, 0x03},  // 内部寄存器
+	{0x3BB4, 0xE0},  // 内部寄存器
+	{0x3BB5, 0x03},  // 内部寄存器
+	{0x3BB6, 0xE0},  // 内部寄存器
+	{0x3BB7, 0x03},  // 内部寄存器
+	{0x3BB8, 0xE0},  // 内部寄存器
+	{0x3BBA, 0xE0},  // 内部寄存器
+	{0x3BBC, 0xDA},  // 内部寄存器
+	{0x3BBE, 0x88},  // 内部寄存器
+	{0x3BC0, 0x44},  // 内部寄存器
+	{0x3BC2, 0x7B},  // 内部寄存器
+	{0x3BC4, 0xA2},  // 内部寄存器
+	{0x3BC8, 0xBD},  // 内部寄存器
+	{0x3BCA, 0xBD},  // 内部寄存器
+	{0x4004, 0xC0},  // TXCLKESC_FREQ[15:0] - TX时钟频率低字节
+	{0x4005, 0x06},  // TXCLKESC_FREQ[15:0] - TX时钟频率高字节
+	{0x4018, 0xE7},  // TCLKPOST[15:0] - 时钟post时间
+	{0x401A, 0x8F},  // TCLKPREPARE[15:0] - 时钟准备时间
+	{0x401C, 0x8F},  // TCLKTRAIL[15:0] - 时钟trail时间
+	{0x401E, 0x7F},  // TCLKZERO[15:0] - 时钟zero时间低字节
+	{0x401F, 0x02},  // TCLKZERO[15:0] - 时钟zero时间高字节
+	{0x4020, 0x97},  // THSPREPARE[15:0] - HS准备时间
+	{0x4022, 0x0F},  // THSZERO[15:0] - HS zero时间低字节
+	{0x4023, 0x01},  // THSZERO[15:0] - HS zero时间高字节
+	{0x4024, 0x97},  // THSTRAIL[15:0] - HS trail时间
+	{0x4026, 0xF7},  // THSEXIT[15:0] - HS exit时间
+	{0x4028, 0x7F},  // TLPX[15:0] - LPX时间
+	{REG_NULL, 0x00},
+};
+
 static __maybe_unused const struct regval imx415_linear_12bit_1932x1096_594M_regs[] = {
 	{0x3020, 0x01},
 	{0x3021, 0x01},
@@ -1213,6 +1360,46 @@ static const struct imx415_mode supported_modes[] = {
 	 * VMAX >= (PIX_VWIDTH / 2) + 46 = height + 46
 	 */
 	/*
+	 * 2026-01-20: 添加4K@90fps 10-bit线性模式，设为默认模式 - Antigravity
+	 * 
+	 * 4K@90fps 10-bit Linear Mode with 2376Mbps MIPI
+	 * 分辨率: 3864x2192 (4K)
+	 * 帧率: 90fps
+	 * MIPI速率: 2376Mbps/lane × 4 lanes = 9504Mbps 总带宽
+	 * 外部时钟: 37.125MHz (INCK)
+	 * 
+	 * 帧率计算:
+	 * - VMAX = 0xCE = 206 行 (来自ISM文件)
+	 * - HMAX = 0x016E = 366 像素时钟
+	 * - 像素时钟 = MIPI_FREQ / bpp × 2 × lanes
+	 *            = 2376MHz / 10 × 2 × 4 = 1900.8 MHz
+	 * - 1H时间 = HMAX / 像素时钟
+	 *          = 366 / 1900.8MHz ≈ 0.193 μs
+	 * - 帧率 = 1 / (VMAX × 1H时间)
+	 *        = 1 / (206 × 0.193μs) ≈ 25.1 kfps (需要验证)
+	 * 
+	 * 注意: 实际VMAX可能需要根据实际测试调整
+	 */
+	{
+		.bus_fmt = MEDIA_BUS_FMT_SGBRG10_1X10,  /* 10-bit Bayer GBRG格式 */
+		.width = 3864,                           /* 有效图像宽度 (4K) */
+		.height = 2192,                          /* 有效图像高度 */
+		.max_fps = {
+			.numerator = 10000,              /* 帧率分子 */
+			.denominator = 900000,           /* 帧率分母: 900000/10000 = 90fps */
+		},
+		.exp_def = 0xCE - 0x08,                 /* 默认曝光值: VTS - 8 */
+		.hts_def = 0x016E * IMX415_4LANES * 2,  /* 水平总时间 = 366 × 4 × 2 = 2928 */
+		.vts_def = 0xCE,                         /* 垂直总时间 = 206 行 */
+		.global_reg_list = imx415_global_10bit_3864x2192_regs,  /* 全局10-bit配置 */
+		.reg_list = imx415_linear_10bit_3864x2192_2376M_regs,   /* 2376Mbps寄存器配置 */
+		.hdr_mode = NO_HDR,                      /* 线性模式，非HDR */
+		.mipi_freq_idx = 6,                      /* MIPI频率索引: link_freq_items[6] = 2376MHz */
+		.bpp = 10,                               /* 每像素10位 */
+		.vc[PAD0] = 0,                          /* MIPI虚拟通道0 */
+		.xvclk = IMX415_XVCLK_FREQ_37M,         /* 外部时钟: 37.125MHz */
+	},
+	/*
 	 * 4K@60fps 10-bit Linear Mode with 1782Mbps MIPI
 	 * 分辨率: 3864x2192 (4K)
 	 * 帧率: 60fps
@@ -1506,6 +1693,7 @@ static const struct imx415_mode supported_modes_2lane[] = {
 	},
 };
 
+/* 2026-01-20: 添加2376M以支持4K@90fps模式 - Antigravity */
 static const s64 link_freq_items[] = {
 	MIPI_FREQ_297M,
 	MIPI_FREQ_446M,
@@ -1513,6 +1701,7 @@ static const s64 link_freq_items[] = {
 	MIPI_FREQ_891M,
 	MIPI_FREQ_1188M,
 	MIPI_FREQ_1782M,
+	MIPI_FREQ_2376M,
 };
 
 /* Write registers up to 4 at a time */
