@@ -2300,9 +2300,7 @@ static int imx415_probe(struct i2c_client *client,
 	}
 
 	imx415->client = client;
-	if (imx415->bus_cfg.bus.mipi_csi2.num_data_lanes == IMX415_4LANES) {
-		imx415->supported_modes = supported_modes;
-		imx415->cfg_num = ARRAY_SIZE(supported_modes);
+/* 2025-01-20: Fixed unbalanced braces and redundant code in imx415_probe - Antigravity */
 	if (imx415->bus_cfg.bus.mipi_csi2.num_data_lanes == IMX415_4LANES) {
 		imx415->supported_modes = supported_modes;
 		imx415->cfg_num = ARRAY_SIZE(supported_modes);
