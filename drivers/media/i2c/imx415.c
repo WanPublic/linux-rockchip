@@ -1383,14 +1383,15 @@ static const struct imx415_mode supported_modes[] = {
 	 */
 	{
 		.bus_fmt = MEDIA_BUS_FMT_SGBRG10_1X10,  /* 10-bit Bayer GBRG格式 */
-		.width = 3864,                           /* 有效图像宽度 (4K) */
-		.height = 2192,                          /* 有效图像高度 */
+		/* 2026-01-25: 修正上报分辨率为 3840x2160，匹配 ISP 标准输入。底层寄存器仍为 3864x2192。 - Antigravity */
+		.width = 3840,
+		.height = 2160,
 		.max_fps = {
 			.numerator = 10000,              /* 帧率分子 */
 			.denominator = 900000,           /* 帧率分母: 900000/10000 = 90fps */
 		},
 		.exp_def = 0x08ca - 0x08,               /* 默认曝光值: VTS - 8 = 2242 */
-		/* 2026-01-25: 修正 hts_def，使其大于有效宽度 3864。参考 65fps 分支设置为 4056。 - Antigravity */
+		/* 2026-01-25: 保持较大 hts_def 以防 CIF 溢出。 - Antigravity */
 		.hts_def = 4056,
 		.vts_def = 0x08ca,                       /* 垂直总时间 = 2250 行 */
 		.global_reg_list = imx415_global_10bit_3864x2192_regs,  /* 全局10-bit配置 */
@@ -3004,6 +3005,12 @@ static int imx415_get_selection(struct v4l2_subdev *sd,
 			sel->r.width = DST_WIDTH_3840;
 			sel->r.top = CROP_START(imx415->cur_mode->height, DST_HEIGHT_2160);
 			sel->r.height = DST_HEIGHT_2160;
+		} else if (imx415->cur_mode->width == 3840) {
+			/* 2026-01-25: 对于上报为 3840 的模式，返回全画幅 crop，让 CIF 处理物理 3864 的裁剪点。 - Antigravity */
+			sel->r.left = 0;
+			sel->r.width = 3840;
+			sel->r.top = 0;
+			sel->r.height = 2160;
 		} else if (imx415->cur_mode->width == 1944) {
 			sel->r.left = CROP_START(imx415->cur_mode->width, DST_WIDTH_1920);
 			sel->r.width = DST_WIDTH_1920;
