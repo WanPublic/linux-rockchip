@@ -1390,7 +1390,8 @@ static const struct imx415_mode supported_modes[] = {
 			.denominator = 900000,           /* 帧率分母: 900000/10000 = 90fps */
 		},
 		.exp_def = 0x08ca - 0x08,               /* 默认曝光值: VTS - 8 = 2242 */
-		.hts_def = 0x016E * IMX415_4LANES * 2,  /* 水平总时间 = 366 × 4 × 2 = 2928 */
+		/* 2026-01-25: 修正 hts_def，使其大于有效宽度 3864。参考 65fps 分支设置为 4056。 - Antigravity */
+		.hts_def = 4056,
 		.vts_def = 0x08ca,                       /* 垂直总时间 = 2250 行 */
 		.global_reg_list = imx415_global_10bit_3864x2192_regs,  /* 全局10-bit配置 */
 		.reg_list = imx415_linear_10bit_3864x2192_2376M_regs,   /* 2376Mbps寄存器配置 */
