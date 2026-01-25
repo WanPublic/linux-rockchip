@@ -2991,7 +2991,13 @@ static int imx415_get_selection(struct v4l2_subdev *sd,
 {
 	struct imx415 *imx415 = to_imx415(sd);
 
-	if (sel->target == V4L2_SEL_TGT_CROP_BOUNDS) {
+	/*
+	 * 2026-01-25: 增加对 V4L2_SEL_TGT_CROP 和 V4L2_SEL_TGT_CROP_DEFAULT 的支持
+	 * 以确保 CIF/ISP 能够正确获取到 3840x2160 的裁剪区域，遵循 65fps 分支的设定。 - Antigravity
+	 */
+	if (sel->target == V4L2_SEL_TGT_CROP_BOUNDS ||
+	    sel->target == V4L2_SEL_TGT_CROP ||
+	    sel->target == V4L2_SEL_TGT_CROP_DEFAULT) {
 		if (imx415->cur_mode->width == 3864) {
 			sel->r.left = CROP_START(imx415->cur_mode->width, DST_WIDTH_3840);
 			sel->r.width = DST_WIDTH_3840;
