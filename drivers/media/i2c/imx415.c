@@ -3020,7 +3020,8 @@ static int imx415_initialize_controls(struct imx415 *imx415)
 				V4L2_CID_LINK_FREQ,
 				ARRAY_SIZE(link_freq_items) - 1, 0,
 				link_freq_items);
-	v4l2_ctrl_s_ctrl(imx415->link_freq, mode->mipi_freq_idx);
+	/* Set link_freq after all controls are created to avoid error -34 */
+	/* v4l2_ctrl_s_ctrl will be called after handler->error check */
 
 	/* pixel rate = link frequency * 2 * lanes / BITS_PER_SAMPLE */
 	pixel_rate = (u32)link_freq_items[mode->mipi_freq_idx] / mode->bpp * 2 * lanes;
@@ -3063,6 +3064,10 @@ static int imx415_initialize_controls(struct imx415 *imx415)
 			"Failed to init controls(%d)\n", ret);
 		goto err_free_handler;
 	}
+
+	/* Set link_freq after all controls are created and error checked */
+	if (imx415->link_freq)
+		v4l2_ctrl_s_ctrl(imx415->link_freq, mode->mipi_freq_idx);
 
 	imx415->subdev.ctrl_handler = handler;
 	imx415->has_init_exp = false;
