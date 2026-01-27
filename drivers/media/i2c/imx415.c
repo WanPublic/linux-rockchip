@@ -1383,11 +1383,11 @@ static __maybe_unused const struct regval imx415_linear_12bit_1284x720_2376M_reg
  */
 static const struct imx415_mode supported_modes[] = {
 	/*
-	 * 1920x1080 @ 90fps
+	 * 1920x1080 @ 30fps (临时降低帧率以匹配寄存器配置)
 	 * IMX415-AAQR 2/2-line binning CSI-2_4lane 37.125MHz AD:10bit Output:12bit 1782Mbps
 	 * Register settings from sunnic_IMX415_RegisterSetting_Ver10.0_20240925_No1.ism
-	 * VMAX = 0xD4 = 212, HMAX = 0x016D = 365
-	 * frame rate = 1 / (VMAX * 1H) = 1 / (212 * HMAX) ≈ 90.011fps
+	 * 注意：原 .ism 文件的 VMAX = 0xD4 太小，需要调整 VTS 以支持 1920x1080
+	 * 参考 1944x1097 @ 30fps 的 VTS = 0x0C5D (3165)，按比例调整
 	 */
 	{
 		.bus_fmt = MEDIA_BUS_FMT_SGBRG12_1X12,
@@ -1395,15 +1395,15 @@ static const struct imx415_mode supported_modes[] = {
 		.height = 1080,
 		.max_fps = {
 			.numerator = 10000,
-			.denominator = 90011,  // 90.011fps
+			.denominator = 300000,  // 30fps
 		},
-		.exp_def = 0x00D4 - 0x08,  // VTS - offset, default exposure
+		.exp_def = 0x0C00 - 0x08,  // VTS - offset
 		.hts_def = 0x016D * IMX415_4LANES * 2,  // HMAX = 365
-		.vts_def = 0x00D4,  // VMAX = 212
+		.vts_def = 0x0C00,  // 临时设置为 3072，确保 > height
 		.global_reg_list = imx415_global_12bit_3864x2192_regs,
 		.reg_list = imx415_linear_12bit_1920x1080_90fps_1782M_regs,
 		.hdr_mode = NO_HDR,
-		.mipi_freq_idx = 5,  // MIPI_FREQ_1782M (index 5 in link_freq_items)
+		.mipi_freq_idx = 5,  // MIPI_FREQ_1782M
 		.bpp = 12,
 		.vc[PAD0] = 0,
 		.xvclk = IMX415_XVCLK_FREQ_37M,
