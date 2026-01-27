@@ -774,15 +774,15 @@ static __maybe_unused const struct regval imx415_linear_12bit_1920x1080_90fps_17
 	{0x3020, 0x01},  // HADD
 	{0x3021, 0x01},  // VADD
 	{0x3022, 0x01},  // ADDMODE[1:0]
-	{0x3024, 0xB0},  // VMAX[19:0] low byte = 1200 (0x04B0)
-	{0x3025, 0x04},  // VMAX[19:0] mid byte
+	{0x3024, 0x60},  // VMAX[19:0] low byte = 2400 (0x0960)
+	{0x3025, 0x09},  // VMAX[19:0] mid byte
 	{0x3026, 0x00},  // VMAX[19:0] high byte
 	{0x3028, 0x6D},  // HMAX[15:0] low byte = 365
 	{0x3029, 0x01},  // HMAX[15:0] high byte
 	{0x302C, 0x00},
 	{0x302D, 0x00},
 	{0x3031, 0x00},  // ADBIT[1:0]
-	{0x3033, 0x05},
+	{0x3033, 0x07},  // 改为 0x07 以匹配 binning 模式
 	{0x3050, 0x08},  // SHR0[19:0] low byte
 	{0x3051, 0x00},  // SHR0[19:0] mid byte
 	{0x3054, 0x19},
@@ -1384,23 +1384,23 @@ static __maybe_unused const struct regval imx415_linear_12bit_1284x720_2376M_reg
  */
 static const struct imx415_mode supported_modes[] = {
 	/*
-	 * 1920x1080 @ 90fps
+	 * 1932x1096 @ 90fps (2/2-line binning 原生分辨率)
 	 * IMX415-AAQR 2/2-line binning CSI-2_4lane 37.125MHz AD:10bit Output:12bit 1782Mbps
 	 * Register settings from sunnic_IMX415_RegisterSetting_Ver10.0_20240925_No1.ism
-	 * 注意：使用较小的 VTS (1200) 以达到高帧率，同时保持 VTS > height
-	 * 实际帧率取决于 MIPI 带宽和 ISP 处理能力
+	 * 注意：Binning 模式输出 1932x1096，在软件层面可裁剪到 1920x1080
+	 * 使用更大的 VTS (2400) 以确保 90fps 时序正确
 	 */
 	{
 		.bus_fmt = MEDIA_BUS_FMT_SGBRG12_1X12,
-		.width = 1920,
-		.height = 1080,
+		.width = 1932,  // Binning 后的原生宽度
+		.height = 1096,  // Binning 后的原生高度
 		.max_fps = {
 			.numerator = 10000,
 			.denominator = 900000,  // 90fps
 		},
-		.exp_def = 0x04B0 - 0x08,  // VTS - offset, 1200 - 8 = 1192
+		.exp_def = 0x0960 - 0x08,  // VTS - offset, 2400 - 8
 		.hts_def = 0x016D * IMX415_4LANES * 2,  // HMAX = 365
-		.vts_def = 0x04B0,  // 1200 行，确保 > height (1080)
+		.vts_def = 0x0960,  // 2400 行
 		.global_reg_list = imx415_global_12bit_3864x2192_regs,
 		.reg_list = imx415_linear_12bit_1920x1080_90fps_1782M_regs,
 		.hdr_mode = NO_HDR,
