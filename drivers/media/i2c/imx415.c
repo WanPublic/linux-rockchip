@@ -774,8 +774,9 @@ static __maybe_unused const struct regval imx415_linear_12bit_1920x1080_90fps_17
 	{0x3020, 0x01},  // HADD
 	{0x3021, 0x01},  // VADD
 	{0x3022, 0x01},  // ADDMODE[1:0]
-	{0x3024, 0xD4},  // VMAX[19:0] low byte = 212
-	{0x3025, 0x00},  // VMAX[19:0] high byte
+	{0x3024, 0xB0},  // VMAX[19:0] low byte = 1200 (0x04B0)
+	{0x3025, 0x04},  // VMAX[19:0] mid byte
+	{0x3026, 0x00},  // VMAX[19:0] high byte
 	{0x3028, 0x6D},  // HMAX[15:0] low byte = 365
 	{0x3029, 0x01},  // HMAX[15:0] high byte
 	{0x302C, 0x00},
