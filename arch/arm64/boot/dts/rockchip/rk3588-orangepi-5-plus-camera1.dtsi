@@ -133,8 +133,8 @@
 		power-gpios = <&gpio1 RK_PD5 GPIO_ACTIVE_HIGH>;
 		rockchip,camera-module-index = <0>;
 		rockchip,camera-module-facing = "back";
-		rockchip,camera-module-name = "CMK-OT2022-PX1";
-		rockchip,camera-module-lens-name = "IR0147-50IRC-8M-F20";
+		rockchip,camera-module-name = "RADXA-CAMERA-4K";
+		rockchip,camera-module-lens-name = "DEFAULT";
 		port {
 			imx415_out: endpoint {
 				remote-endpoint = <&mipi_in_ucam2>;
