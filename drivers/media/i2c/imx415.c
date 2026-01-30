@@ -29,6 +29,8 @@
  * 3. enum all supported mode mbus_code, not just cur_mode.
  * V0.0X01.0X08
  * 1. add dcphy param for hdrx2 mode.
+ * V0.0X01.0X09
+ * 1. 2026-01-30: 同步 1080p 90fps 驱动代码到 orange-pi-5-plus 分支
  */
 
 #define DEBUG
