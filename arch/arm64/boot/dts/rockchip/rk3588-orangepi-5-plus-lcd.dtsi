@@ -1,11 +1,15 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Orange Pi 5 Plus MIPI DSI LCD overlay.
+ * 启用 MIPI DSI1 与 panel、VP3->DSI1 路由及触摸 I2C7。
+ */
 
 &dsi1 {
-	status = "disabled";
+	status = "okay";
 };
 
 &dsi1_panel {
-	status = "disabled";
+	status = "okay";
 	reset-gpios = <&gpio2 RK_PC1 GPIO_ACTIVE_LOW>;
 	enable-gpios = <&gpio1 RK_PD2 GPIO_ACTIVE_HIGH>;
 	pinctrl-names = "default";
@@ -17,11 +21,11 @@
 };
 
 &dsi1_in_vp3 {
-	status = "disabled";
+	status = "okay";
 };
 
 &route_dsi1 {
-	status = "disabled";
+	status = "okay";
 	connect = <&vp3_out_dsi1>;
 };
 
@@ -35,11 +39,11 @@
 		interrupts = <RK_PB2 IRQ_TYPE_LEVEL_LOW>;
 		irq-gpios = <&gpio2 RK_PB2 IRQ_TYPE_LEVEL_LOW>;
 		reset-gpios = <&gpio2 RK_PB5 GPIO_ACTIVE_HIGH>;
-		touchscreen-inverted-x;
+		//touchscreen-inverted-x;
 		//touchscreen-inverted-y;
-		touchscreen-swapped-x-y;
-		touchscreen-size-x = <1280>;
-		touchscreen-size-y = <800>;
+		//touchscreen-swapped-x-y;
+		touchscreen-size-x = <1080>;
+		touchscreen-size-y = <1920>;
 		status = "okay";
 	};
 };
