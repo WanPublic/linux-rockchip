@@ -371,8 +371,9 @@
 };
 
 /* Should work with at least 128MB cma reserved above. */
+/* 启用 HDMI in (hdmirx)，供 HDMI 输入与 hdmiin-sound 使用 */
 &hdmirx_ctrler {
-	status = "disabled";
+	status = "okay";
 
 	#sound-dai-cells = <1>;
 	/* Effective level used to trigger HPD: 0-low, 1-high */
