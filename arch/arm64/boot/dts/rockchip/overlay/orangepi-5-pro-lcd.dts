@@ -2,6 +2,12 @@
 /plugin/;
 
 / {
+	/*
+	 * 2026-04-21: LCD overlay 仅负责打开 DSI1 路由与节点状态。
+	 * panel/触摸 GPIO 与参数以主 DTS 为准，对齐
+	 * ubuntu-rockchip/display/rk3588s-orangepi-5-pro.dts，避免在 overlay 内
+	 * 重复定义触摸节点导致 Goodix 驱动重复注册。
+	 */
 	fragment@0 {
 		target = <&dsi1>;
 		__overlay__ {
@@ -17,9 +23,24 @@
 	};
 
 	fragment@2 {
+		target = <&dsi1_in_vp2>;
+		__overlay__ {
+			status = "disabled";
+		};
+	};
+
+	fragment@3 {
 		target = <&dsi1_in_vp3>;
 		__overlay__ {
 			status = "okay";
+		};
+	};
+
+	fragment@4 {
+		target = <&route_dsi1>;
+		__overlay__ {
+			status = "okay";
+			connect = <&vp3_out_dsi1>;
 		};
 	};
 };

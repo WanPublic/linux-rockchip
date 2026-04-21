@@ -25,6 +25,13 @@
 				remote-endpoint = <&ov13855_out2>;
 				data-lanes = <1 2>;
 			};
+
+			/* 2026-04-20: 为 cam1 增加 imx415 专用 endpoint。 */
+			mipi_in_ucam2: endpoint@2 {
+				reg = <2>;
+				remote-endpoint = <&imx415_out>;
+				data-lanes = <1 2 3 4>;
+			};
 		};
 		port@1 {
 		        reg = <1>;
@@ -104,6 +111,31 @@
 			ov13855_out2: endpoint {
 				remote-endpoint = <&mipi_in_ucam1>;
 				data-lanes = <1 2>;
+			};
+		};
+	};
+
+	/* 2026-04-20: 参考 plus 分支接入方式，补充 5-pro cam1 的 imx415 节点。 */
+	imx415_1: imx415@37 {
+		compatible = "sony,imx415";
+		status = "disabled";
+		reg = <0x37>;
+		clocks = <&cru CLK_MIPI_CAMARAOUT_M3>;
+		clock-names = "xvclk";
+		pinctrl-names = "default";
+		pinctrl-0 = <&mipim1_camera3_clk>;
+		power-domains = <&power RK3588_PD_VI>;
+		/* 5-pro cam1 复用现有同组 GPIO。 */
+		reset-gpios = <&gpio3 RK_PC4 GPIO_ACTIVE_LOW>;
+		power-gpios = <&gpio3 RK_PC6 GPIO_ACTIVE_HIGH>;
+		rockchip,camera-module-index = <0>;
+		rockchip,camera-module-facing = "back";
+		rockchip,camera-module-name = "RADXA-CAMERA-4K";
+		rockchip,camera-module-lens-name = "DEFAULT";
+		port {
+			imx415_out: endpoint {
+				remote-endpoint = <&mipi_in_ucam2>;
+				data-lanes = <1 2 3 4>;
 			};
 		};
 	};
