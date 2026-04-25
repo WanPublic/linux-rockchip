@@ -180,17 +180,18 @@
 	status = "disabled";
 	port {
 		mipi2_lvds_sditf: endpoint {
-			remote-endpoint = <&isp0_vir1>;
+			/* 2026-04-25: 切换 cam1 到 ISP vir0，保证 4K 高帧率链路独占通道。 */
+			remote-endpoint = <&isp0_vir0>;
 		};
 	};
 };
 
-&rkisp0_vir1 {
+&rkisp0_vir0 {
 	status = "disabled";
 	port {
 		#address-cells = <1>;
 		#size-cells = <0>;
-		isp0_vir1: endpoint@0 {
+		isp0_vir0: endpoint@0 {
 			reg = <0>;
 			remote-endpoint = <&mipi2_lvds_sditf>;
 		};

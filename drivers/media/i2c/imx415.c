@@ -64,6 +64,7 @@
 #define V4L2_CID_DIGITAL_GAIN		V4L2_CID_GAIN
 #endif
 
+#define MIPI_FREQ_2376M			2376000000
 #define MIPI_FREQ_1782M			1782000000
 #define MIPI_FREQ_1188M			1188000000
 #define MIPI_FREQ_891M			891000000
@@ -74,7 +75,7 @@
 #define IMX415_4LANES			4
 #define IMX415_2LANES			2
 
-#define IMX415_MAX_PIXEL_RATE		(MIPI_FREQ_1782M / 10 * 2 * IMX415_4LANES)
+#define IMX415_MAX_PIXEL_RATE		(MIPI_FREQ_2376M / 10 * 2 * IMX415_4LANES)
 #define OF_CAMERA_HDR_MODE		"rockchip,camera-hdr-mode"
 
 #define IMX415_XVCLK_FREQ_37M		37125000
@@ -688,15 +689,20 @@ static __maybe_unused const struct regval imx415_linear_10bit_3864x2192_891M_reg
  * 37.125MHz 
  * AD:10bit 
  * Output:10bit 
- * 1782Mbps 
+ * 2376Mbps
  * Master Mode 
- * 65fps 
+ * 90fps
+ * 2026-04-25: 基于 sunnic_IMX415_RegisterSetting_Ver10.0_20231206_No1（4K 90FPS).ism
+ * 更新关键时序寄存器，作为 4K90 默认模式。
  */
 static __maybe_unused const struct regval imx415_linear_10bit_3864x2192_1782M_regs[] = {
 	{0x3002, 0x00},
-	{0x3008, 0x7F},
-	{0x300A, 0x5B},
-	{0x3028, 0xFB},
+	{0x3008, 0x5D},
+	{0x300A, 0x42},
+	{0x3024, 0xCE},
+	{0x3025, 0x08},
+	{0x3026, 0x00},
+	{0x3028, 0x6E},
 	{0x3029, 0x01},
 	{0x30C0, 0x0A},
 	{0x30C1, 0x00},
@@ -704,11 +710,14 @@ static __maybe_unused const struct regval imx415_linear_10bit_3864x2192_1782M_re
 	{0x30CD, 0x00},
 	{0x3031, 0x00},
 	{0x3032, 0x00},
-	{0x3050, 0x84},
-	{0x3051, 0x03},
+	{0x3050, 0x08},
+	{0x3051, 0x00},
 	{0x3090, 0x14},
-	{0x3116, 0x24},
-	{0x311E, 0x24},
+	{0x3116, 0x23},
+	{0x3118, 0x08},
+	{0x3119, 0x01},
+	{0x311A, 0xE7},
+	{0x311E, 0x23},
 	{0x32D4, 0x21},
 	{0x32EC, 0xA1},
 	{0x344C, 0x2B},
@@ -809,8 +818,19 @@ static __maybe_unused const struct regval imx415_linear_10bit_3864x2192_1782M_re
 	{0x3BC4, 0xA2},
 	{0x3BC8, 0xBD},
 	{0x3BCA, 0xBD},
-	{0x4004, 0x48},
-	{0x4005, 0x09},
+	{0x4004, 0xC0},
+	{0x4005, 0x06},
+	{0x4018, 0xE7},
+	{0x401A, 0x8F},
+	{0x401C, 0x8F},
+	{0x401E, 0x7F},
+	{0x401F, 0x02},
+	{0x4020, 0x97},
+	{0x4022, 0x0F},
+	{0x4023, 0x01},
+	{0x4024, 0x97},
+	{0x4026, 0xF7},
+	{0x4028, 0x7F},
 	{REG_NULL, 0x00},
 };
 
@@ -1446,20 +1466,20 @@ static const struct imx415_mode supported_modes[] = {
 	 * VMAX >= (PIX_VWIDTH / 2) + 46 = height + 46
 	 */
 	/*
-	 * 4K@60fps 10-bit Linear Mode with 1782Mbps MIPI
+	 * 4K@90fps 10-bit Linear Mode with 2376Mbps MIPI
 	 * 分辨率: 3864x2192 (4K)
-	 * 帧率: 60fps
-	 * MIPI速率: 1782Mbps/lane × 4 lanes = 7128Mbps 总带宽
+	 * 帧率: 90fps
+	 * MIPI速率: 2376Mbps/lane × 4 lanes = 9504Mbps 总带宽
 	 * 
 	 * 帧率计算:
 	 * - 像素时钟 = MIPI_FREQ / bpp × 2 × lanes
-	 *            = 1782MHz / 10 × 2 × 4 = 1425.6 MHz
+	 *            = 2376MHz / 10 × 2 × 4 = 1900.8 MHz
 	 * - 1H时间 = HTS / 像素时钟
-	 *          = (0x01fb × 4 × 2) / 1425.6MHz ≈ 8.96 μs
+	 *          = (0x016e × 4 × 2) / 1900.8MHz ≈ 3.08 μs
 	 * - 帧率 = 1 / (VTS × 1H时间)
-	 *        = 1 / (0x08ca × 8.96μs) ≈ 49.6 fps
-	 * 
-	 * 注意: 实际帧率约50fps，如需精确60fps需调整VTS值
+	 *        = 1 / (0x08ce × 3.08μs) ≈ 90.0 fps
+	 *
+	 * 2026-04-25: 依据 sunnic 4K90 ISM 调整关键时序参数。
 	 */
 	{
 		.bus_fmt = MEDIA_BUS_FMT_SGBRG10_1X10,  /* 10-bit Bayer GBRG格式 */
@@ -1467,15 +1487,15 @@ static const struct imx415_mode supported_modes[] = {
 		.height = 2192,                          /* 有效图像高度 */
 		.max_fps = {
 			.numerator = 10000,              /* 帧率分子 */
-			.denominator = 650000,           /* 帧率分母: 650000/10000 = 65fps */
+			.denominator = 900000,           /* 帧率分母: 900000/10000 = 90fps */
 		},
-		.exp_def = 0x08ca - 0x08,               /* 默认曝光值: VTS - 8 */
-		.hts_def = 0x01fb * IMX415_4LANES * 2,  /* 水平总时间 = 507 × 4 × 2 = 4056 */
-		.vts_def = 0x08ca,                       /* 垂直总时间 = 2250 行 */
+		.exp_def = 0x08ce - 0x08,               /* 默认曝光值: VTS - 8 */
+		.hts_def = 0x016e * IMX415_4LANES * 2,  /* 水平总时间 = 366 × 4 × 2 = 2928 */
+		.vts_def = 0x08ce,                       /* 垂直总时间 = 2254 行 */
 		.global_reg_list = imx415_global_10bit_3864x2192_regs,  /* 全局10-bit配置 */
 		.reg_list = imx415_linear_10bit_3864x2192_1782M_regs,   /* 1782Mbps寄存器配置 */
 		.hdr_mode = NO_HDR,                      /* 线性模式，非HDR */
-		.mipi_freq_idx = 5,                      /* MIPI频率索引: link_freq_items[5] = 1782MHz */
+		.mipi_freq_idx = 6,                      /* MIPI频率索引: link_freq_items[6] = 2376MHz */
 		.bpp = 10,                               /* 每像素10位 */
 		.vc[PAD0] = 0,                          /* MIPI虚拟通道0 */
 		.xvclk = IMX415_XVCLK_FREQ_37M,         /* 外部时钟: 37.125MHz */
@@ -1746,6 +1766,7 @@ static const s64 link_freq_items[] = {
 	MIPI_FREQ_891M,
 	MIPI_FREQ_1188M,
 	MIPI_FREQ_1782M,
+	MIPI_FREQ_2376M,
 };
 
 /* Write registers up to 4 at a time */
@@ -2980,7 +3001,8 @@ static int imx415_open(struct v4l2_subdev *sd, struct v4l2_subdev_fh *fh)
 	struct imx415 *imx415 = to_imx415(sd);
 	struct v4l2_mbus_framefmt *try_fmt =
 				v4l2_subdev_get_try_format(sd, fh->state, 0);
-	const struct imx415_mode *def_mode = &imx415->supported_modes[0];
+	const struct imx415_mode *def_mode = imx415->cur_mode ?
+		imx415->cur_mode : &imx415->supported_modes[0];
 
 	mutex_lock(&imx415->mutex);
 	/* Initialize try_fmt */
@@ -3248,7 +3270,7 @@ static int imx415_initialize_controls(struct imx415 *imx415)
 
 	/* pixel rate = link frequency * 2 * lanes / BITS_PER_SAMPLE */
 	pixel_rate = (u32)link_freq_items[mode->mipi_freq_idx] / mode->bpp * 2 * lanes;
-	max_pixel_rate = (u32)MIPI_FREQ_1782M / mode->bpp * 2 * lanes;
+	max_pixel_rate = (u32)MIPI_FREQ_2376M / mode->bpp * 2 * lanes;
 	imx415->pixel_rate = v4l2_ctrl_new_std(handler, NULL,
 		V4L2_CID_PIXEL_RATE, 0, max_pixel_rate,
 		1, pixel_rate);
@@ -3399,12 +3421,29 @@ static int imx415_probe(struct i2c_client *client,
 	dev_info(dev, "detect imx415 lane %d\n",
 		imx415->bus_cfg.bus.mipi_csi2.num_data_lanes);
 
+	imx415->cur_mode = NULL;
 	for (i = 0; i < imx415->cfg_num; i++) {
-		if (hdr_mode == imx415->supported_modes[i].hdr_mode) {
-			imx415->cur_mode = &imx415->supported_modes[i];
+		const struct imx415_mode *mode = &imx415->supported_modes[i];
+
+		if (hdr_mode != mode->hdr_mode)
+			continue;
+
+		/*
+		 * 2026-04-25: NO_HDR 默认优先 4K90，满足上电即 4K90 的需求。
+		 */
+		if (hdr_mode == NO_HDR &&
+		    mode->width == 3864 &&
+		    mode->height == 2192 &&
+		    mode->max_fps.denominator >= 900000) {
+			imx415->cur_mode = mode;
 			break;
 		}
+
+		if (!imx415->cur_mode)
+			imx415->cur_mode = mode;
 	}
+	if (!imx415->cur_mode)
+		imx415->cur_mode = &imx415->supported_modes[0];
 
 	of_property_read_u32(node, RKMODULE_CAMERA_FASTBOOT_ENABLE,
 		&imx415->is_thunderboot);

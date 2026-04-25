@@ -972,6 +972,14 @@
 	status = "okay";
 };
 
+&{/reserved-memory/cma} {
+	/*
+	 * 2026-04-25: 4K90 路径需要更大的连续内存池，避免 rkcif/rkisp 分配失败。
+	 * 修改历史：将板级 CMA 从默认值覆盖为 512MB。
+	 */
+	size = <0x0 (512 * 0x100000)>;
+};
+
 &rkcif {
         status = "okay";
 };
