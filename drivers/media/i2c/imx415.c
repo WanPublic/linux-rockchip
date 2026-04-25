@@ -697,9 +697,10 @@ static __maybe_unused const struct regval imx415_linear_10bit_3864x2192_891M_reg
  */
 static __maybe_unused const struct regval imx415_linear_10bit_3864x2192_1782M_regs[] = {
 	{0x3002, 0x00},
-	{0x3008, 0x5D},
-	{0x300A, 0x42},
-	{0x3024, 0xCE},
+	/* 2026-04-25: 4K90 按 37.125MHz 套参对齐 4k90fps.c，避免 CSI ECC 错误。 */
+	{0x3008, 0x7F},
+	{0x300A, 0x5B},
+	{0x3024, 0xCA},
 	{0x3025, 0x08},
 	{0x3026, 0x00},
 	{0x3028, 0x6E},
@@ -710,14 +711,15 @@ static __maybe_unused const struct regval imx415_linear_10bit_3864x2192_1782M_re
 	{0x30CD, 0x00},
 	{0x3031, 0x00},
 	{0x3032, 0x00},
+	{0x3033, 0x00},
 	{0x3050, 0x08},
 	{0x3051, 0x00},
 	{0x3090, 0x14},
-	{0x3116, 0x23},
-	{0x3118, 0x08},
+	{0x3116, 0x24},
+	{0x3118, 0x00},
 	{0x3119, 0x01},
-	{0x311A, 0xE7},
-	{0x311E, 0x23},
+	{0x311A, 0xE0},
+	{0x311E, 0x24},
 	{0x32D4, 0x21},
 	{0x32EC, 0xA1},
 	{0x344C, 0x2B},
@@ -818,8 +820,8 @@ static __maybe_unused const struct regval imx415_linear_10bit_3864x2192_1782M_re
 	{0x3BC4, 0xA2},
 	{0x3BC8, 0xBD},
 	{0x3BCA, 0xBD},
-	{0x4004, 0xC0},
-	{0x4005, 0x06},
+	{0x4004, 0x48},
+	{0x4005, 0x09},
 	{0x4018, 0xE7},
 	{0x401A, 0x8F},
 	{0x401C, 0x8F},
@@ -1489,9 +1491,9 @@ static const struct imx415_mode supported_modes[] = {
 			.numerator = 10000,              /* 帧率分子 */
 			.denominator = 900000,           /* 帧率分母: 900000/10000 = 90fps */
 		},
-		.exp_def = 0x08ce - 0x08,               /* 默认曝光值: VTS - 8 */
+		.exp_def = 0x08ca - 0x08,               /* 默认曝光值: VTS - 8 */
 		.hts_def = 0x016e * IMX415_4LANES * 2,  /* 水平总时间 = 366 × 4 × 2 = 2928 */
-		.vts_def = 0x08ce,                       /* 垂直总时间 = 2254 行 */
+		.vts_def = 0x08ca,                       /* 垂直总时间 = 2250 行 */
 		.global_reg_list = imx415_global_10bit_3864x2192_regs,  /* 全局10-bit配置 */
 		.reg_list = imx415_linear_10bit_3864x2192_1782M_regs,   /* 1782Mbps寄存器配置 */
 		.hdr_mode = NO_HDR,                      /* 线性模式，非HDR */
