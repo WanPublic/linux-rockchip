@@ -186,8 +186,23 @@
 	};
 };
 
+&rkisp_unite {
+	/* 2026-04-28: 预留 unite 模式开关，由 overlay 按需置为 okay。 */
+	status = "disabled";
+};
+
+&rkisp_unite_mmu {
+	/* 2026-04-28: unite 模式配套 MMU，和 rkisp_unite 同步启用。 */
+	status = "disabled";
+};
+
 &rkisp0_vir0 {
 	status = "disabled";
+	/*
+	 * 2026-04-28: 为 cam1 增加 unite 模式绑定入口。
+	 * 默认保持禁用，overlay 启用时切换到 rkisp_unite。
+	 */
+	rockchip,hw = <&rkisp0>;
 	port {
 		#address-cells = <1>;
 		#size-cells = <0>;

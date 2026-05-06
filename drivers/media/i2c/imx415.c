@@ -849,13 +849,16 @@ static __maybe_unused const struct regval imx415_linear_10bit_3864x2192_1782M_re
  * Based on: sunnic_IMX415_RegisterSetting_Ver10.0_20231206_No1（4K 90FPS).ism
  */
 static __maybe_unused const struct regval imx415_linear_10bit_3864x2192_2376M_regs[] = {
-	/* 2026-04-23: 按 4k90fps.c 同步 37.125MHz 4K90 全像素寄存器 */
+	/*
+	 * 2026-04-23: 按 4k90fps.c 同步 37.125MHz 4K90 全像素寄存器
+	 * 2026-04-28: 对齐 sunnic 4K90 ISM 的 27MHz 关键寄存器，排查 ECC2。
+	 */
 	{0x3002, 0x00},
-	{0x3008, 0x7F},
-	{0x300A, 0x5B},
+	{0x3008, 0x5D},
+	{0x300A, 0x42},
 	{0x301C, 0x00},
 	{0x3022, 0x00},
-	{0x3024, 0xCA},
+	{0x3024, 0xCE},
 	{0x3025, 0x08},
 	{0x3026, 0x00},
 	{0x3028, 0x6E},
@@ -1616,27 +1619,8 @@ static const struct imx415_mode supported_modes[] = {
 		 * 2026-04-27: 回退默认模式到 4K 1782M 安全档位，
 		 * 避免开机默认进入 2376M 导致 rkisp PIC_SIZE_ERROR。
 		 * 4K90(2376M) 仍保留在后续模式中，可手动切换验证。
+		 * 2026-04-28: 按当前需求恢复默认为 4K90(2376M)。
 		 */
-		.bus_fmt = MEDIA_BUS_FMT_SGBRG10_1X10,
-		.width = 3864,
-		.height = 2192,
-		.max_fps = {
-			.numerator = 10000,
-			.denominator = 650000,
-		},
-		.exp_def = 0x08ca - 0x08,
-		.hts_def = 0x01fb * IMX415_4LANES * 2,
-		.vts_def = 0x08ca,
-		.global_reg_list = imx415_global_10bit_3864x2192_regs,
-		.reg_list = imx415_linear_10bit_3864x2192_1782M_regs,
-		.hdr_mode = NO_HDR,
-		.mipi_freq_idx = 5,
-		.bpp = 10,
-		.vc[PAD0] = 0,
-		.xvclk = IMX415_XVCLK_FREQ_37M,
-	},
-	{
-		/* 2026-04-27: 保留 4K90 高速模式，非默认 */
 		.bus_fmt = MEDIA_BUS_FMT_SGBRG10_1X10,
 		.width = 3864,
 		.height = 2192,
@@ -1651,6 +1635,27 @@ static const struct imx415_mode supported_modes[] = {
 		.reg_list = imx415_linear_10bit_3864x2192_2376M_regs,
 		.hdr_mode = NO_HDR,
 		.mipi_freq_idx = 6,
+		.bpp = 10,
+		.vc[PAD0] = 0,
+		/* 2026-04-28: 4K90(2376M) 改为 27MHz，与 ISM 套参一致。 */
+		.xvclk = IMX415_XVCLK_FREQ_27M,
+	},
+	{
+		/* 2026-04-27: 保留 4K 1782M 安全模式，改为非默认可选 */
+		.bus_fmt = MEDIA_BUS_FMT_SGBRG10_1X10,
+		.width = 3864,
+		.height = 2192,
+		.max_fps = {
+			.numerator = 10000,
+			.denominator = 650000,
+		},
+		.exp_def = 0x08ca - 0x08,
+		.hts_def = 0x01fb * IMX415_4LANES * 2,
+		.vts_def = 0x08ca,
+		.global_reg_list = imx415_global_10bit_3864x2192_regs,
+		.reg_list = imx415_linear_10bit_3864x2192_1782M_regs,
+		.hdr_mode = NO_HDR,
+		.mipi_freq_idx = 5,
 		.bpp = 10,
 		.vc[PAD0] = 0,
 		.xvclk = IMX415_XVCLK_FREQ_37M,
@@ -1683,16 +1688,18 @@ static const struct imx415_mode supported_modes[] = {
 			.numerator = 10000,              /* 帧率分子 */
 			.denominator = 900000,           /* 帧率分母: 900000/10000 = 90fps */
 		},
-		.exp_def = 0x08ca - 0x08,               /* 默认曝光值: VTS - 8 */
+		/* 2026-04-28: 对齐 sunnic 4K90 ISM 的 VMAX=0x08CE。 */
+		.exp_def = 0x08ce - 0x08,               /* 默认曝光值: VTS - 8 */
 		.hts_def = 0x016e * IMX415_4LANES * 2,  /* 水平总时间 = 366 × 4 × 2 = 2928 */
-		.vts_def = 0x08ca,                       /* 垂直总时间 = 2250 行 */
+		.vts_def = 0x08ce,                       /* 垂直总时间 = 2254 行 */
 		.global_reg_list = imx415_global_10bit_3864x2192_regs,  /* 全局10-bit配置 */
-		.reg_list = imx415_linear_10bit_3864x2192_1782M_regs,   /* 1782Mbps寄存器配置 */
+		/* 2026-04-28: 修正为 2376M 对应寄存器表，避免模式定义与实际不一致。 */
+		.reg_list = imx415_linear_10bit_3864x2192_2376M_regs,   /* 2376Mbps寄存器配置 */
 		.hdr_mode = NO_HDR,                      /* 线性模式，非HDR */
 		.mipi_freq_idx = 6,                      /* MIPI频率索引: link_freq_items[6] = 2376MHz */
 		.bpp = 10,                               /* 每像素10位 */
 		.vc[PAD0] = 0,                          /* MIPI虚拟通道0 */
-		.xvclk = IMX415_XVCLK_FREQ_37M,         /* 外部时钟: 37.125MHz */
+		.xvclk = IMX415_XVCLK_FREQ_27M,         /* 外部时钟: 27MHz */
 	},
 	{
 		.bus_fmt = MEDIA_BUS_FMT_SGBRG10_1X10,

@@ -44,11 +44,15 @@
 	};
 
 	fragment@5 {
-		/* 2026-04-25: cam1 切换到 rkisp0_vir0，避免 vir1 链路能力受限。 */
+		/*
+		 * 2026-04-25: cam1 切换到 rkisp0_vir0，避免 vir1 链路能力受限。
+		 * 2026-04-28: 尝试启用 ISP unite，缓解 4K90 下 ISP 处理瓶颈。
+		 */
 		target = <&rkisp0_vir0>;
 
 		__overlay__ {
 			status = "okay";
+			rockchip,hw = <&rkisp_unite>;
 		};
 	};
 
@@ -80,7 +84,11 @@
 		target = <&rkisp0>;
 
 		__overlay__ {
-			status = "okay";
+			/*
+			 * 2026-04-28: cam1 走 ISP unite 时，必须关闭单 ISP 硬件节点，
+			 * 避免与 rkisp_unite 争用同一寄存器资源导致卡死。
+			 */
+			status = "disabled";
 		};
 	};
 
@@ -88,6 +96,25 @@
 		target = <&isp0_mmu>;
 
 		__overlay__ {
+			/* 2026-04-28: 与上面 rkisp0 一致，unite 模式下关闭单 ISP MMU。 */
+			status = "disabled";
+		};
+	};
+
+	fragment@11 {
+		target = <&rkisp_unite>;
+
+		__overlay__ {
+			/* 2026-04-28: 打开 unite 硬件节点。 */
+			status = "okay";
+		};
+	};
+
+	fragment@12 {
+		target = <&rkisp_unite_mmu>;
+
+		__overlay__ {
+			/* 2026-04-28: 打开 unite MMU 节点。 */
 			status = "okay";
 		};
 	};
